@@ -2,73 +2,277 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login — Personal Manager</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #f5f0e8; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 20px; }
-    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-    .brand svg { width: 32px; height: 32px; color: #b45309; }
-    .brand-name { font-size: 20px; font-weight: 700; color: #1c1917; letter-spacing: -0.3px; }
-    .brand-name span { color: #b45309; }
-    .card { background: #fffdf7; border: 1px solid #e5ddd0; border-radius: 16px; padding: 36px; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-    .card-title { font-size: 22px; font-weight: 700; color: #1c1917; margin-bottom: 6px; }
-    .card-sub { font-size: 13px; color: #78716c; margin-bottom: 28px; }
-    label { display: block; font-size: 12px; font-weight: 600; color: #57534e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
-    .input-wrap { position: relative; margin-bottom: 20px; }
-    .input-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #a8a29e; pointer-events: none; }
-    input { width: 100%; padding: 11px 14px 11px 40px; background: #faf7f2; border: 1px solid #d6cfc4; border-radius: 10px; font-size: 14px; color: #1c1917; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    input:focus { border-color: #b45309; box-shadow: 0 0 0 3px rgba(180,83,9,0.1); }
-    input::placeholder { color: #c4bdb5; }
-    .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; letter-spacing: 0.3px; transition: background 0.2s; }
-    .btn:hover { background: #92400e; }
-    .flash { display: flex; align-items: center; gap: 8px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; padding: 11px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; }
-    .flash svg { width: 15px; height: 15px; flex-shrink: 0; }
-    .divider { height: 1px; background: #e5ddd0; margin: 24px 0; }
-    .footer-link { text-align: center; font-size: 13px; color: #78716c; }
-    .footer-link a { color: #b45309; text-decoration: none; font-weight: 600; }
-    .footer-link a:hover { text-decoration: underline; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #fbf6ea;
+      --surface: #fffdf7;
+      --surface-2: #f7f1e4;
+      --border: #e4dccd;
+      --border-strong: #d6ccbb;
+      --text: #111111;
+      --muted: #4f4f4f;
+      --muted-2: #6d6d6d;
+      --shadow: 0 10px 30px rgba(17, 17, 17, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+
+    .brand svg {
+      width: 32px;
+      height: 32px;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+
+    .brand-name span {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 26px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .input-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--muted-2);
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    input::placeholder {
+      color: #9b9b9b;
+    }
+
+    input:focus {
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+      background: #fffaf0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px 14px;
+      background: var(--text);
+      color: #ffffff;
+      border: 1px solid var(--text);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
+      transition: transform 0.15s ease, opacity 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      opacity: 0.92;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .flash {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #f7f7f7;
+      color: var(--text);
+      border: 1px solid #dedede;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .flash svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .footer-link {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .footer-link a {
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 26px 20px;
+      }
+
+      .card-title {
+        font-size: 22px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="brand">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <div class="brand-name">Personal<span>Manager</span></div>
     </div>
+
     <div class="card">
       <div class="card-title">Welcome back</div>
       <div class="card-sub">Sign in to manage your documents</div>
+
       {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="flash">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          {{ messages[0] }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ messages[0] }}</span>
         </div>
         {% endif %}
       {% endwith %}
+
       <form method="POST">
-        <label>Email address</label>
+        <label for="email">Email address</label>
         <div class="input-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
           </svg>
-          <input type="email" name="email" placeholder="you@gmail.com" required>
+          <input id="email" type="email" name="email" placeholder="you@gmail.com" autocomplete="email" required>
         </div>
-        <label>Password</label>
+
+        <label for="password">Password</label>
         <div class="input-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
-          <input type="password" name="password" placeholder="••••••••" required>
+          <input id="password" type="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
         </div>
+
         <button class="btn" type="submit">Sign In</button>
       </form>
+
       <div class="divider"></div>
-      <div class="footer-link">Don't have an account? <a href="/register">Create one</a></div>
+
+      <div class="footer-link">
+        Don't have an account? <a href="/register">Create one</a>
+      </div>
     </div>
   </div>
 </body>
