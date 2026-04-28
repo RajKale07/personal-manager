@@ -604,11 +604,59 @@
       cursor: pointer;
       transition: background 0.2s ease, transform 0.2s ease;
     }
+    .done-btn:hover { background: var(--surface-2); transform: translateY(-1px); }
 
-    .done-btn:hover {
-      background: var(--surface-2);
-      transform: translateY(-1px);
+    .action-btn {
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
+    .action-btn:hover { background: var(--surface-2); }
+    .action-btn.del { border-color: #e0b0ac; color: #a33; }
+    .action-btn.del:hover { background: #fde8e6; }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(17,17,17,0.35);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(17,17,17,0.14);
+    }
+    .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-footer .btn { flex: 1; }
+    .btn-cancel {
+      flex: 1;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover { background: var(--surface-2); }
 
     .empty {
       padding: 34px 18px;
@@ -767,6 +815,35 @@
         </svg>
         {{ advisor_message }}
       </div>
+    {% endif %}
+
+    {% set urgent = expiring | selectattr('2', 'le', 7) | list %}
+    {% set warn   = expiring | rejectattr('2', 'le', 7) | list %}
+    {% if urgent %}
+    <div class="alert" style="background:#f9eceb; border-color:#f0ccc8; margin-bottom:12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <div>
+        <strong>Urgent — expiring very soon:</strong>
+        {% for doc in urgent %}
+          <span style="margin-left:8px;">{{ doc[0] }} <strong>({{ doc[2] }} day{{ 's' if doc[2] != 1 }})</strong>{% if not loop.last %},{% endif %}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if warn %}
+    <div class="alert" style="margin-bottom:12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div>
+        <strong>Reminder — expiring within 30 days:</strong>
+        {% for doc in warn %}
+          <span style="margin-left:8px;">{{ doc[0] }} <strong>({{ doc[2] }} days)</strong>{% if not loop.last %},{% endif %}</span>
+        {% endfor %}
+      </div>
+    </div>
     {% endif %}
 
     <div class="advisor-card mb-18">
@@ -988,6 +1065,7 @@
                 <th>Issue Date</th>
                 <th>Expiry Date</th>
                 <th>Importance</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -998,6 +1076,12 @@
                 <td>{{ doc[4] }}</td>
                 <td>{{ doc[5] }}</td>
                 <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
+                <td style="white-space:nowrap;">
+                  <button class="action-btn" onclick="openEdit({{ doc[0] }}, '{{ doc[2] }}', '{{ doc[3] }}', '{{ doc[4] }}', '{{ doc[5] }}', '{{ doc[6] }}')">Edit</button>
+                  <form method="POST" action="/document/delete/{{ doc[0] }}" style="display:inline;" onsubmit="return confirm('Delete {{ doc[2] }}? This cannot be undone.');">
+                    <button class="action-btn del" type="submit">Delete</button>
+                  </form>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -1068,9 +1152,64 @@
     </div>
   </div>
 
+  <!-- Edit Document Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <div class="modal-title">Edit Document</div>
+      <form method="POST" id="editForm">
+        <div class="field">
+          <label>Document Name</label>
+          <input type="text" name="document_name" id="edit_name" required>
+        </div>
+        <div class="field">
+          <label>Issuing Authority</label>
+          <input type="text" name="authority" id="edit_authority" required>
+        </div>
+        <div class="field">
+          <label>Issue Date</label>
+          <input type="date" name="issue_date" id="edit_issue_date" required>
+        </div>
+        <div class="field">
+          <label>Expiry Date</label>
+          <input type="date" name="expiry_date" id="edit_expiry_date" required>
+        </div>
+        <div class="field">
+          <label>Importance</label>
+          <select name="importance" id="edit_importance" required>
+            <option value="High">High — Critical document</option>
+            <option value="Medium">Medium — Important</option>
+            <option value="Low">Low — Optional</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="closeEdit()">Cancel</button>
+          <button type="submit" class="btn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     document.querySelectorAll('.bar-fill[data-width]').forEach(function (el) {
       el.style.width = el.getAttribute('data-width') + '%';
+    });
+
+    function openEdit(id, name, authority, issueDate, expiryDate, importance) {
+      document.getElementById('editForm').action = '/document/edit/' + id;
+      document.getElementById('edit_name').value = name;
+      document.getElementById('edit_authority').value = authority;
+      document.getElementById('edit_issue_date').value = issueDate;
+      document.getElementById('edit_expiry_date').value = expiryDate;
+      document.getElementById('edit_importance').value = importance;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeEdit() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEdit();
     });
   </script>
 </body>
