@@ -1,6 +1,47 @@
 # Personal Manager
 
-A web-based personal document manager built with **Flask** and **MySQL**. Users can register, log in, add their important documents, and get notified when documents are about to expire. Admins can view all users and their documents.
+A web-based personal document management system built with **Flask** and **MySQL**. Users can register, log in, track their important documents, get notified before expiry, manage renewal tasks, and look up step-by-step issue procedures for Indian government documents.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Database Schema](#database-schema)
+- [How It Works](#how-it-works)
+- [Setup Instructions](#setup-instructions)
+- [Sample Login Credentials](#sample-login-credentials)
+- [Pages and Routes](#pages-and-routes)
+- [Issue Guide — Supported Documents](#issue-guide--supported-documents)
+- [Known Limitations](#known-limitations)
+
+---
+
+## Features
+
+- User registration and login with session-based authentication
+- Add and view personal documents (name, authority, issue date, expiry date, importance)
+- Expiry notifications — urgent banner for documents expiring within 7 days, warning for within 30 days
+- Expired document tracking with auto-created renewal tasks
+- Task management — view pending renewal tasks and mark them as done
+- Search-driven Issue Guide — type any document name to get the full issue procedure, required documents, what you already have, and what you still need
+- Readiness progress bar showing how many required documents you already own
+- Admin panel — view all registered users and all documents across the system
+- Light cream UI theme with responsive layout
+
+---
+
+## Tech Stack
+
+| Layer      | Technology               |
+|------------|--------------------------|
+| Backend    | Python 3.x, Flask        |
+| Database   | MySQL 8.0                |
+| Frontend   | HTML, CSS (no framework) |
+| Templating | Jinja2                   |
+| Connector  | mysql-connector-python   |
 
 ---
 
@@ -8,27 +49,15 @@ A web-based personal document manager built with **Flask** and **MySQL**. Users 
 
 ```
 DBMS/
-├── app.py                  # Flask backend — all routes and logic
-├── setup_database.sql      # MySQL schema + sample data (run this first)
-├── personal_manager.py     # Old CLI version (no longer used)
-├── database_setup.sql      # Duplicate SQL file (older version)
+├── app.py                  # Flask backend — all routes, DB logic, ISSUE_GUIDE data
+├── setup_database.sql      # Complete MySQL schema + sample data (run this first)
+├── README.md               # This file
 └── templates/
     ├── login.html          # Login page
     ├── register.html       # Register page
-    ├── dashboard.html      # User dashboard
+    ├── dashboard.html      # User dashboard — documents, tasks, issue guide
     └── admin.html          # Admin panel
 ```
-
----
-
-## Tech Stack
-
-| Layer     | Technology              |
-|-----------|-------------------------|
-| Backend   | Python 3, Flask         |
-| Database  | MySQL 8.0               |
-| Frontend  | HTML, CSS (no framework)|
-| Connector | mysql-connector-python  |
 
 ---
 
@@ -36,45 +65,64 @@ DBMS/
 
 ### Tables
 
-- **users** — stores registered users (user_id, name, email, password, created_date)
-- **documents** — stores user documents (document_id, user_id, document_name, authority, issue_date, expiry_date, importance)
-- **deadlines** — stores deadlines (deadline_id, user_id, title, description, due_date, status)
-- **goals** — stores goals (goal_id, user_id, goal_name, start_date, target_date, progress, status)
-- **contacts** — stores contacts (contact_id, user_id, contact_name, relationship, phone)
+| Table       | Key Columns                                                                          |
+|-------------|--------------------------------------------------------------------------------------|
+| `users`     | user_id, name, email, password, created_date                                         |
+| `documents` | document_id, user_id, document_name, authority, issue_date, expiry_date, importance  |
+| `tasks`     | task_id, user_id, document_id (FK), task_type, status                                |
+| `deadlines` | deadline_id, user_id, title, description, due_date, status                           |
+| `goals`     | goal_id, user_id, goal_name, start_date, target_date, progress, status               |
+| `contacts`  | contact_id, user_id, contact_name, relationship, phone                               |
 
 ### View
 
-- **expiring_documents** — returns all documents expiring within the next 30 days
+- **`expiring_documents`** — returns all documents with expiry date within the next 30 days
 
 ### Stored Procedure
 
-- **get_upcoming_deadlines()** — returns deadlines due within the next 7 days
+- **`get_upcoming_deadlines()`** — returns deadlines due within the next 7 days
 
 ---
 
 ## How It Works
 
-### 1. User Registration & Login
+### 1. Registration and Login
 - User registers at `/register` with name, email, and password
 - On login at `/`, email and password are matched against the `users` table
-- If email is `admin@example.com`, user is redirected to the **Admin Panel**
-- Otherwise, user is redirected to the **Dashboard**
-- Session stores `user_id`, `name`, and `is_admin` flag
+- If the email is `admin@example.com`, the user is redirected to the Admin Panel
+- Otherwise the user is redirected to the Dashboard
+- Session stores `user_id`, `name`, and `is_admin`
 
-### 2. User Dashboard (`/dashboard`)
-- Shows a form to **add a new document** (name, authority, issue date, expiry date, importance)
-- Shows a table of **all documents** belonging to the logged-in user
-- Shows a **notification banner** if any document is expiring within the next 30 days, with days remaining
+### 2. Dashboard
+- Shows stats — total documents saved and pending renewal tasks
+- Shows expiry notification banners at the top if any documents are expiring soon
+- Three sections: Add Document form, My Documents table, Renewal Tasks table
+- Issue Guide search box at the top — type a document name to get the full guide
 
-### 3. Document Expiry Notifications
-- On every dashboard load, the app queries documents expiring within 30 days for that user
-- A highlighted alert banner is shown at the top listing each expiring document and how many days are left
-- Color coded: urgent if ≤ 7 days, warning if ≤ 30 days
+### 3. Expiry Notifications
+- Urgent banner (red) for documents expiring within 7 days
+- Warning banner (amber) for documents expiring within 8–30 days
+- Both banners list each document with the exact number of days remaining
 
-### 4. Admin Panel (`/admin`)
-- Only accessible if logged in as `admin@example.com`
-- Shows a table of **all registered users**
-- Shows a table of **all documents** across all users with the owner's name
+### 4. Renewal Tasks
+- When a document's expiry date passes, a `Renew` task is automatically created for it
+- Duplicate tasks are prevented — the system checks before inserting
+- Users can mark tasks as Done from the dashboard
+
+### 5. Issue Guide
+- User types a document name (e.g. Passport, PAN Card, Driving License) in the search box
+- The dashboard shows:
+  - Step-by-step procedure to obtain that document
+  - Full list of required documents
+  - Which required documents the user already has (green tags)
+  - Which required documents are still missing (red tags)
+  - A readiness progress bar showing the percentage of requirements met
+
+### 6. Admin Panel
+- Only accessible when logged in as `admin@example.com`
+- Shows total user count and total document count
+- Table of all registered users
+- Table of all documents across all users with the owner's name
 
 ---
 
@@ -91,19 +139,25 @@ pip install flask mysql-connector-python
 ```
 
 ### Step 2 — Set up the database
-Open cmd and run:
 ```
 mysql -u root -p < "path\to\setup_database.sql"
 ```
-This creates the `personal_manager` database, all tables, the view, stored procedure, and inserts sample data.
+This creates the `personal_manager` database, all tables, the view, the stored procedure, and inserts sample data.
 
-### Step 3 — Configure password
-In `app.py`, update the password in `get_db()`:
+### Step 3 — Create the admin account
+Run this in MySQL after setup:
+```sql
+INSERT INTO users (name, email, password, created_date)
+VALUES ('Admin', 'admin@example.com', 'admin123', CURDATE());
+```
+
+### Step 4 — Configure your DB password
+In `app.py`, update the password inside `get_db()`:
 ```python
 password="your_mysql_root_password"
 ```
 
-### Step 4 — Run the app
+### Step 5 — Run the app
 ```
 python app.py
 ```
@@ -113,46 +167,50 @@ Open your browser at `http://127.0.0.1:5000`
 
 ## Sample Login Credentials
 
-| Role  | Email                  | Password     |
-|-------|------------------------|--------------|
-| User  | john@example.com       | password123  |
-| User  | jane@example.com       | password456  |
-| Admin | admin@example.com      | admin123     |
-
-> To create the admin account, run this in MySQL:
-> ```sql
-> INSERT INTO users (name, email, password, created_date)
-> VALUES ('Admin', 'admin@example.com', 'admin123', CURDATE());
-> ```
+| Role  | Email              | Password     |
+|-------|--------------------|--------------|
+| User  | john@example.com   | password123  |
+| User  | jane@example.com   | password456  |
+| Admin | admin@example.com  | admin123     |
 
 ---
 
-## Pages & Routes
+## Pages and Routes
 
-| Route          | Method    | Description                        |
-|----------------|-----------|------------------------------------|
-| `/`            | GET, POST | Login page                         |
-| `/register`    | GET, POST | Register new user                  |
-| `/dashboard`   | GET       | User dashboard with documents      |
-| `/add_document`| POST      | Add a new document                 |
-| `/admin`       | GET       | Admin panel (admin only)           |
-| `/logout`      | GET       | Clear session and redirect to login|
+| Route                    | Method    | Description                              |
+|--------------------------|-----------|------------------------------------------|
+| `/`                      | GET, POST | Login page                               |
+| `/register`              | GET, POST | Register a new user                      |
+| `/dashboard`             | GET       | User dashboard                           |
+| `/dashboard?document=X`  | GET       | Dashboard with issue guide result for X  |
+| `/add_document`          | POST      | Add a new document                       |
+| `/task/done/<task_id>`   | POST      | Mark a renewal task as done              |
+| `/admin`                 | GET       | Admin panel (admin only)                 |
+| `/logout`                | GET       | Clear session and redirect to login      |
 
 ---
 
-## Features
+## Issue Guide — Supported Documents
 
-- User authentication (login / register)
-- Add and view personal documents
-- Document expiry notifications (30-day warning on dashboard)
-- Admin panel to monitor all users and documents
-- Dark professional UI theme
-- Importance badges (High / Medium / Low) with color coding
+The built-in issue guide covers the following Indian government documents:
+
+| Document          | Key Required Documents                                      |
+|-------------------|-------------------------------------------------------------|
+| Passport          | Aadhaar Card, Birth Certificate, 10th Marksheet, Address Proof |
+| Driving License   | Aadhaar Card, Address Proof, Age Proof, Passport Photo      |
+| Aadhaar Card      | Birth Certificate, Address Proof, Passport Photo            |
+| PAN Card          | Aadhaar Card, Birth Certificate, Address Proof, Passport Photo |
+| Voter ID          | Aadhaar Card, Address Proof, Passport Photo, Age Proof      |
+| Vehicle RC        | Driving License, Insurance Policy, Address Proof, PAN Card  |
+| Insurance Policy  | Aadhaar Card, PAN Card, Address Proof, Passport Photo       |
+| Birth Certificate | Hospital Discharge Summary, Parents Aadhaar Card, Address Proof |
 
 ---
 
 ## Known Limitations
 
-- Passwords are stored as plain text (no hashing) — for demo/college use only
-- No email notifications — reminders are shown on the dashboard only
-- Goals and deadlines tables exist in the DB but are not used in the web app yet
+- Passwords are stored as plain text — for demo/college use only, not production
+- No email notifications — expiry reminders are shown on the dashboard only
+- No CSRF protection on POST routes
+- `debug=True` is set in `app.run()` — must be disabled before any deployment
+- `goals`, `deadlines`, and `contacts` tables exist in the DB but have no web routes yet
