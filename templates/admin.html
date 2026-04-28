@@ -23,125 +23,161 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
-    button, input, select { font: inherit; }
+    button, input { font: inherit; }
 
     /* Navbar */
     .navbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(255,253,247,0.95); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      min-height: 68px; padding: 0 24px;
+      height: 64px; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between; gap: 14px;
     }
     .nav-brand { display: flex; align-items: center; gap: 10px; }
-    .nav-brand svg { width: 24px; height: 24px; flex-shrink: 0; }
-    .nav-brand-name { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap; }
-    .admin-tag { padding: 5px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 11px; font-weight: 800; }
-    .logout-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--text); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700; transition: background 0.2s; flex-shrink: 0; }
-    .logout-btn svg { width: 15px; height: 15px; }
+    .nav-brand svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .nav-brand-name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap; }
+    .admin-tag { padding: 4px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 11px; font-weight: 800; }
+    .logout-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--text); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700; transition: background 0.2s; flex-shrink: 0; }
+    .logout-btn svg { width: 14px; height: 14px; }
     .logout-btn:hover { background: var(--surface-2); }
 
-    .main { max-width: 1000px; margin: 0 auto; padding: 28px 18px 48px; }
+    .main { max-width: 1200px; margin: 0 auto; padding: 24px 18px 48px; }
 
-    .page-title { font-size: clamp(26px, 3vw, 36px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
-    .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
-
-    .flash {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: #eef7ee; border: 1px solid #c8e6c9;
-      padding: 12px 14px; border-radius: 12px; margin-bottom: 18px;
-      font-size: 13px; line-height: 1.5;
-    }
-    .flash svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
-
-    /* Stats */
-    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
-    .stat-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); }
-    .stat-icon svg { width: 20px; height: 20px; }
-    .stat-val { font-size: 26px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    /* Stats row */
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 22px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); }
+    .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); }
+    .stat-icon svg { width: 18px; height: 18px; }
+    .stat-val { font-size: 24px; font-weight: 800; line-height: 1; margin-bottom: 3px; }
     .stat-label { font-size: 12px; color: var(--muted); }
 
-    /* Search card */
-    .search-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 18px; padding: 28px; box-shadow: var(--shadow); margin-bottom: 24px;
-    }
-    .search-card-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
-    .search-card-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; line-height: 1.6; }
+    .flash { display: flex; align-items: flex-start; gap: 10px; background: #eef7ee; border: 1px solid #c8e6c9; padding: 12px 14px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
+    .flash svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
 
-    .search-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .search-input {
-      flex: 1; min-width: 200px;
-      padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-strong);
-      background: #fff; color: var(--text); font-size: 14px; outline: none;
+    /* Layout: sidebar + content */
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    /* Sidebar — user dictionary */
+    .sidebar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 80px;
+    }
+
+    .sidebar-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .sidebar-title {
+      font-size: 13px; font-weight: 800; margin-bottom: 10px; color: var(--text);
+    }
+
+    .sidebar-search {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .search-input:focus { border-color: var(--text); box-shadow: 0 0 0 3px rgba(17,17,17,0.07); }
-    .search-input::placeholder { color: #9b9b9b; }
+    .sidebar-search:focus { border-color: var(--text); box-shadow: 0 0 0 3px rgba(17,17,17,0.07); }
+    .sidebar-search::placeholder { color: #9b9b9b; }
 
-    .btn-search {
-      padding: 12px 20px; border-radius: 12px; border: 1px solid var(--text);
-      background: var(--text); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
-      transition: opacity 0.2s; white-space: nowrap;
+    .user-list { max-height: calc(100vh - 260px); overflow-y: auto; }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn-search:hover { opacity: 0.85; }
-    .btn-clear {
-      padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-strong);
-      background: var(--surface); color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer;
-      transition: background 0.2s; white-space: nowrap;
+    .user-item:last-child { border-bottom: none; }
+    .user-item:hover { background: var(--surface-2); }
+    .user-item.active { background: var(--surface-3); border-left: 3px solid var(--text); padding-left: 13px; }
+
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 999px;
+      background: var(--surface-3); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; flex-shrink: 0; color: var(--text);
     }
-    .btn-clear:hover { background: var(--surface-2); }
+    .user-item.active .user-avatar { background: var(--text); color: #fff; }
 
-    /* Datalist hint */
-    .hint { font-size: 12px; color: var(--muted-2); margin-top: 10px; line-height: 1.6; }
+    .user-item-info { min-width: 0; }
+    .user-item-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-item-meta { font-size: 11px; color: var(--muted-2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Search results */
-    .results-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted-2); margin-bottom: 10px; }
+    .no-users { padding: 24px 16px; text-align: center; font-size: 13px; color: var(--muted); }
 
-    .user-result-list { display: grid; gap: 10px; }
-    .user-result {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 14px 18px; background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 14px; flex-wrap: wrap;
+    /* Right content panel */
+    .content-panel { min-width: 0; }
+
+    .empty-state {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 60px 24px;
+      text-align: center; box-shadow: var(--shadow);
     }
-    .user-result-info { display: flex; flex-direction: column; gap: 3px; }
-    .user-result-name { font-size: 14px; font-weight: 800; }
-    .user-result-meta { font-size: 12px; color: var(--muted); }
-    .user-result-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .empty-state svg { width: 44px; height: 44px; color: var(--border-strong); margin: 0 auto 14px; display: block; }
+    .empty-state-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+    .empty-state-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-    .action-btn {
-      border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
-      border-radius: 9px; padding: 7px 14px; font-size: 12px; font-weight: 700;
-      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    /* User detail card */
+    .user-detail-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 22px; margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
     }
-    .action-btn:hover { background: var(--surface-3); }
-    .action-btn.view { border-color: #a8c8e8; color: #1a5a8a; background: #eaf3fb; }
-    .action-btn.view:hover { background: #d6eaf8; }
+    .user-detail-left { display: flex; align-items: center; gap: 14px; }
+    .user-detail-avatar {
+      width: 48px; height: 48px; border-radius: 999px;
+      background: var(--text); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; flex-shrink: 0;
+    }
+    .user-detail-name { font-size: 17px; font-weight: 800; margin-bottom: 3px; }
+    .user-detail-meta { font-size: 12px; color: var(--muted); }
 
-    /* Documents section */
+    .btn-edit {
+      padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border-strong);
+      background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .btn-edit:hover { background: var(--surface-2); }
+
+    /* Documents table card */
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
-    .card-header { display: flex; align-items: center; gap: 10px; padding: 16px 22px; border-bottom: 1px solid var(--border); background: rgba(247,241,228,0.55); }
-    .card-header svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .card-header h2 { font-size: 16px; font-weight: 800; }
-
-    .docs-user-banner {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 22px; background: #eaf3fb; border-bottom: 1px solid #c0ddf0;
-      font-size: 13px; font-weight: 700; color: #1a5a8a; flex-wrap: wrap; gap: 8px;
-    }
-    .docs-user-banner a { font-size: 12px; font-weight: 600; color: #1a5a8a; text-decoration: underline; text-underline-offset: 2px; }
+    .card-header { display: flex; align-items: center; gap: 10px; padding: 15px 20px; border-bottom: 1px solid var(--border); background: rgba(247,241,228,0.55); }
+    .card-header svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .card-header h2 { font-size: 15px; font-weight: 800; }
 
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 11px 18px; border-bottom: 1px solid var(--border); background: var(--surface-2); color: var(--muted-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; white-space: nowrap; }
-    td { padding: 13px 18px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); vertical-align: middle; }
+    th { text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface-2); color: var(--muted-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); vertical-align: middle; }
     tr:last-child td { border-bottom: 0; }
     tr:hover td { background: var(--surface-2); }
 
-    .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .empty-docs { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
 
-    .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid var(--border); white-space: nowrap; }
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; border: 1px solid var(--border); white-space: nowrap; }
     .high   { background: #fde8e6; border-color: #f5c6c2; }
     .medium { background: #fdf3e0; border-color: #f0dba8; }
     .low    { background: #e8f4ec; border-color: #b8dfc2; }
@@ -149,25 +185,29 @@
     /* Edit modal */
     .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(17,17,17,0.35); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(17,17,17,0.14); }
-    .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(17,17,17,0.14); }
+    .modal-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
     .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
     .field { margin-bottom: 14px; }
     label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted-2); margin-bottom: 6px; }
-    input[type=text], input[type=email], input[type=password] { width: 100%; padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border-strong); background: #fff; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    input[type=text], input[type=email], input[type=password] { width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border-strong); background: #fff; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-size: 13px; }
     input:focus { border-color: var(--text); box-shadow: 0 0 0 3px rgba(17,17,17,0.07); }
     input::placeholder { color: #9b9b9b; }
     .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
-    .btn-save { flex: 1; padding: 12px; border-radius: 11px; border: 1px solid var(--text); background: var(--text); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .btn-save { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--text); background: var(--text); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
     .btn-save:hover { opacity: 0.88; }
-    .btn-cancel { flex: 1; padding: 12px; border-radius: 11px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn-cancel { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .btn-cancel:hover { background: var(--surface-2); }
 
-    @media (max-width: 720px) {
-      .navbar { padding: 12px 14px; flex-direction: column; align-items: flex-start; height: auto; }
-      .main { padding: 16px 12px 28px; }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .user-list { max-height: 260px; }
+    }
+    @media (max-width: 600px) {
+      .navbar { padding: 10px 14px; }
+      .main { padding: 14px 12px 32px; }
       .stats { grid-template-columns: 1fr; }
-      th, td { padding-left: 12px; padding-right: 12px; }
     }
   </style>
 </head>
@@ -192,8 +232,6 @@
   </nav>
 
   <div class="main">
-    <div class="page-title">Admin Panel</div>
-    <div class="page-sub">Search for a user to view and manage their documents</div>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -206,7 +244,6 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Stats -->
     <div class="stats">
       <div class="stat-card">
         <div class="stat-icon">
@@ -228,104 +265,111 @@
         </div>
         <div>
           <div class="stat-val">{{ documents|length if selected_user else '—' }}</div>
-          <div class="stat-label">{{ 'Documents for ' + selected_user[1] if selected_user else 'Select a user to see documents' }}</div>
+          <div class="stat-label">{{ 'Documents — ' + selected_user[1] if selected_user else 'Select a user' }}</div>
         </div>
       </div>
     </div>
 
-    <!-- Search Card -->
-    <div class="search-card">
-      <div class="search-card-title">Find a user</div>
-      <div class="search-card-sub">Type a name, email address, or user ID. A dropdown will suggest matching users.</div>
+    <div class="layout">
 
-      <form class="search-row" method="GET" action="/admin">
-        <input
-          class="search-input"
-          type="text"
-          name="search"
-          placeholder="e.g. John, john@example.com, or 3"
-          value="{{ search }}"
-          list="user-suggestions"
-          autocomplete="off"
-        >
-        <datalist id="user-suggestions">
+      <!-- Left sidebar: user dictionary -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">Users</div>
+          <input
+            class="sidebar-search"
+            type="text"
+            id="sidebarSearch"
+            placeholder="Search name, email or ID..."
+            oninput="filterUsers(this.value)"
+            value="{{ search }}"
+          >
+        </div>
+        <div class="user-list" id="userList">
           {% for u in users %}
-          <option value="{{ u[1] }}">ID {{ u[0] }} — {{ u[2] }}</option>
-          {% endfor %}
-        </datalist>
-        <button class="btn-search" type="submit">Search</button>
-        {% if search or view_user_id %}
-        <a href="/admin"><button class="btn-clear" type="button">Clear</button></a>
-        {% endif %}
-      </form>
-
-      {% if search and not filtered_users %}
-        <p style="margin-top:14px; font-size:13px; color:var(--muted);">No users found for "<strong>{{ search }}</strong>".</p>
-      {% endif %}
-
-      {% if filtered_users %}
-      <div style="margin-top: 18px;">
-        <div class="results-label">{{ filtered_users|length }} user{{ 's' if filtered_users|length != 1 }} found</div>
-        <div class="user-result-list">
-          {% for u in filtered_users %}
-          <div class="user-result">
-            <div class="user-result-info">
-              <div class="user-result-name">{{ u[1] }}</div>
-              <div class="user-result-meta">ID: {{ u[0] }} &nbsp;·&nbsp; {{ u[2] }} &nbsp;·&nbsp; Joined: {{ u[3] }}</div>
-            </div>
-            <div class="user-result-actions">
-              <a href="/admin?user_id={{ u[0] }}&search={{ search }}">
-                <button class="action-btn view {% if view_user_id == u[0]|string %}active{% endif %}">View Documents</button>
-              </a>
-              <button class="action-btn" onclick="openEditUser({{ u[0] }}, '{{ u[1] }}', '{{ u[2] }}')">Edit</button>
+          <div
+            class="user-item {% if view_user_id == u[0]|string %}active{% endif %}"
+            data-name="{{ u[1]|lower }}"
+            data-email="{{ u[2]|lower }}"
+            data-id="{{ u[0] }}"
+            onclick="selectUser({{ u[0] }}, '{{ u[1] }}', '{{ u[2] }}', '{{ u[3] }}')"
+          >
+            <div class="user-avatar">{{ u[1][0]|upper }}</div>
+            <div class="user-item-info">
+              <div class="user-item-name">{{ u[1] }}</div>
+              <div class="user-item-meta">ID {{ u[0] }} · {{ u[2] }}</div>
             </div>
           </div>
           {% endfor %}
         </div>
+        <div class="no-users" id="noUsers" style="display:none;">No users match your search.</div>
       </div>
-      {% endif %}
-    </div>
 
-    <!-- Documents — only shown after View Documents is clicked -->
-    {% if selected_user %}
-    <div class="card">
-      <div class="docs-user-banner">
-        <span>Documents for: <strong>{{ selected_user[1] }}</strong> &nbsp;·&nbsp; {{ selected_user[2] }}</span>
-        <a href="/admin?search={{ search }}">← Back to search results</a>
+      <!-- Right content panel -->
+      <div class="content-panel" id="contentPanel">
+
+        {% if selected_user %}
+        <!-- User detail -->
+        <div class="user-detail-card">
+          <div class="user-detail-left">
+            <div class="user-detail-avatar">{{ selected_user[1][0]|upper }}</div>
+            <div>
+              <div class="user-detail-name">{{ selected_user[1] }}</div>
+              <div class="user-detail-meta">ID: {{ selected_user[0] }} &nbsp;·&nbsp; {{ selected_user[2] }} &nbsp;·&nbsp; Joined: {{ selected_user[3] }}</div>
+            </div>
+          </div>
+          <button class="btn-edit" onclick="openEditUser({{ selected_user[0] }}, '{{ selected_user[1] }}', '{{ selected_user[2] }}')">Edit User</button>
+        </div>
+
+        <!-- Documents -->
+        <div class="card">
+          <div class="card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <h2>Documents</h2>
+          </div>
+          {% if documents %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Document</th><th>Authority</th><th>Issue Date</th><th>Expiry Date</th><th>Importance</th></tr>
+              </thead>
+              <tbody>
+                {% for doc in documents %}
+                <tr>
+                  <td>{{ doc[2] }}</td>
+                  <td>{{ doc[3] }}</td>
+                  <td>{{ doc[4] }}</td>
+                  <td>{{ doc[5] }}</td>
+                  <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-docs">This user has no documents saved yet.</div>
+          {% endif %}
+        </div>
+
+        {% else %}
+        <!-- Empty state -->
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <div class="empty-state-title">Select a user</div>
+          <div class="empty-state-sub">Click any user from the list on the left to view their documents and details.</div>
+        </div>
+        {% endif %}
+
       </div>
-      <div class="card-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-        </svg>
-        <h2>{{ selected_user[1] }}'s Documents</h2>
-      </div>
-      {% if documents %}
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Document</th><th>Authority</th><th>Issue Date</th><th>Expiry Date</th><th>Importance</th></tr>
-          </thead>
-          <tbody>
-            {% for doc in documents %}
-            <tr>
-              <td>{{ doc[2] }}</td>
-              <td>{{ doc[3] }}</td>
-              <td>{{ doc[4] }}</td>
-              <td>{{ doc[5] }}</td>
-              <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <div class="empty">This user has no documents saved yet.</div>
-      {% endif %}
     </div>
-    {% endif %}
   </div>
 
   <!-- Edit User Modal -->
@@ -355,6 +399,26 @@
   </div>
 
   <script>
+    function selectUser(id, name, email, joined) {
+      window.location.href = '/admin?user_id=' + id;
+    }
+
+    function filterUsers(query) {
+      const q = query.toLowerCase();
+      const items = document.querySelectorAll('.user-item');
+      let visible = 0;
+      items.forEach(function(item) {
+        const match = item.dataset.name.includes(q) || item.dataset.email.includes(q) || item.dataset.id.includes(q);
+        item.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      document.getElementById('noUsers').style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    // Run filter on load if search value is pre-filled
+    const initialSearch = document.getElementById('sidebarSearch').value;
+    if (initialSearch) filterUsers(initialSearch);
+
     function openEditUser(id, name, email) {
       document.getElementById('editUserForm').action = '/admin/user/' + id + '/edit';
       document.getElementById('eu_name').value = name;
