@@ -341,19 +341,15 @@ def admin():
     users = cursor.fetchall()
 
     # Filter users by search
-    filtered_users = users
+    filtered_users = []
     if search:
         sl = search.lower()
         filtered_users = [u for u in users if sl in u[1].lower() or sl in u[2].lower() or sl == str(u[0])]
 
-    # Documents: show for specific user or all
+    # Documents: only load when a specific user is selected
     selected_user = None
+    documents = []
     if view_user_id and view_user_id.isdigit():
-        cursor.execute(
-            "SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id "
-            "WHERE d.user_id = %s ORDER BY d.expiry_date",
-            (int(view_user_id),),
-        )
         cursor.execute("SELECT user_id, name, email FROM users WHERE user_id = %s", (int(view_user_id),))
         selected_user = cursor.fetchone()
         cursor.execute(
@@ -361,9 +357,6 @@ def admin():
             "WHERE d.user_id = %s ORDER BY d.expiry_date",
             (int(view_user_id),),
         )
-        documents = cursor.fetchall()
-    else:
-        cursor.execute("SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id ORDER BY u.name, d.expiry_date")
         documents = cursor.fetchall()
 
     cursor.close()
