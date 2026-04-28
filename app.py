@@ -337,7 +337,7 @@ def admin():
 
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id, name, email, created_date FROM users ORDER BY user_id")
+    cursor.execute("SELECT user_id, name, email, created_date FROM users WHERE email != %s ORDER BY user_id", (ADMIN_EMAIL,))
     users = cursor.fetchall()
 
     # Filter users by search
