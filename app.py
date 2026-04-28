@@ -229,6 +229,13 @@ def add_document():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    doc_name = request.form["document_name"]
+    if doc_name == "__other__":
+        doc_name = request.form.get("custom_document_name", "").strip()
+        if not doc_name:
+            flash("Please enter a custom document name.")
+            return redirect(url_for("dashboard"))
+
     conn = get_db()
     cursor = conn.cursor()
 
@@ -238,7 +245,7 @@ def add_document():
             "VALUES (%s, %s, %s, %s, %s, %s)",
             (
                 session["user_id"],
-                request.form["document_name"],
+                doc_name,
                 request.form["authority"],
                 request.form["issue_date"],
                 request.form["expiry_date"],
