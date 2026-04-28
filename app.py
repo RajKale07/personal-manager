@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 import mysql.connector
 from datetime import date
 
@@ -347,6 +347,11 @@ def admin():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return make_response("", 204)
 
 
 if __name__ == "__main__":
