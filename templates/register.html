@@ -2,57 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Register - Personal Manager</title>
+  <title>Register — Personal Manager</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 360px; }
-    .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; }
-    .logo svg { width: 32px; height: 32px; color: #4f46e5; }
-    h2 { font-size: 22px; color: #333; }
-    .input-wrap { position: relative; margin-bottom: 16px; }
-    .input-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #999; }
-    input { width: 100%; padding: 10px 14px 10px 38px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-    button { width: 100%; padding: 11px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
-    button:hover { background: #4338ca; }
-    .flash { background: #dcfce7; color: #166534; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; }
-    .link { text-align: center; margin-top: 16px; font-size: 13px; }
-    .link a { color: #4f46e5; text-decoration: none; }
+    body { font-family: 'Inter', sans-serif; background: #f5f0e8; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; padding: 20px; }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+    .brand svg { width: 32px; height: 32px; color: #b45309; }
+    .brand-name { font-size: 20px; font-weight: 700; color: #1c1917; letter-spacing: -0.3px; }
+    .brand-name span { color: #b45309; }
+    .card { background: #fffdf7; border: 1px solid #e5ddd0; border-radius: 16px; padding: 36px; width: 100%; max-width: 400px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .card-title { font-size: 22px; font-weight: 700; color: #1c1917; margin-bottom: 6px; }
+    .card-sub { font-size: 13px; color: #78716c; margin-bottom: 28px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #57534e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .input-wrap { position: relative; margin-bottom: 20px; }
+    .input-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #a8a29e; pointer-events: none; }
+    input { width: 100%; padding: 11px 14px 11px 40px; background: #faf7f2; border: 1px solid #d6cfc4; border-radius: 10px; font-size: 14px; color: #1c1917; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    input:focus { border-color: #b45309; box-shadow: 0 0 0 3px rgba(180,83,9,0.1); }
+    input::placeholder { color: #c4bdb5; }
+    input.error { border-color: #dc2626; }
+    .hint { font-size: 11px; color: #a8a29e; margin-top: -14px; margin-bottom: 16px; }
+    .err-msg { font-size: 11px; color: #dc2626; margin-top: -14px; margin-bottom: 16px; display: none; }
+    .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; letter-spacing: 0.3px; transition: background 0.2s; }
+    .btn:hover { background: #92400e; }
+    .flash { display: flex; align-items: center; gap: 8px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 11px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; }
+    .flash.err { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .flash svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .divider { height: 1px; background: #e5ddd0; margin: 24px 0; }
+    .footer-link { text-align: center; font-size: 13px; color: #78716c; }
+    .footer-link a { color: #b45309; text-decoration: none; font-weight: 600; }
+    .footer-link a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">
+  <div class="wrapper">
+    <div class="brand">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
-      <h2>Create Account</h2>
+      <div class="brand-name">Personal<span>Manager</span></div>
     </div>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}
-    {% endwith %}
-    <form method="POST">
-      <div class="input-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-        </svg>
-        <input type="text" name="name" placeholder="Full Name" required>
-      </div>
-      <div class="input-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-        </svg>
-        <input type="email" name="email" placeholder="Email" required>
-      </div>
-      <div class="input-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
-        <input type="password" name="password" placeholder="Password" required>
-      </div>
-      <button type="submit">Register</button>
-    </form>
-    <div class="link">Already have an account? <a href="/">Login</a></div>
+    <div class="card">
+      <div class="card-title">Create your account</div>
+      <div class="card-sub">Start managing your documents today</div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash {% if 'Error' in messages[0] %}err{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ messages[0] }}
+        </div>
+        {% endif %}
+      {% endwith %}
+      <form method="POST" id="regForm">
+        <label>Full Name</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          <input type="text" name="name" id="name" placeholder="John Doe" required>
+        </div>
+        <label>Email address</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <input type="email" name="email" id="email" placeholder="you@gmail.com" required>
+        </div>
+        <div class="err-msg" id="emailErr">Please enter a valid email like name@gmail.com</div>
+        <div class="hint">Use a valid email address (e.g. name@gmail.com)</div>
+        <label>Password</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" name="password" id="password" placeholder="Min. 6 characters" required minlength="6">
+        </div>
+        <div class="err-msg" id="passErr">Password must be at least 6 characters</div>
+        <button class="btn" type="submit">Create Account</button>
+      </form>
+      <div class="divider"></div>
+      <div class="footer-link">Already have an account? <a href="/">Sign In</a></div>
+    </div>
   </div>
+  <script>
+    const form = document.getElementById('regForm');
+    const emailInput = document.getElementById('email');
+    const passInput = document.getElementById('password');
+    const emailErr = document.getElementById('emailErr');
+    const passErr = document.getElementById('passErr');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    emailInput.addEventListener('blur', () => {
+      const bad = !emailRegex.test(emailInput.value);
+      emailInput.classList.toggle('error', bad);
+      emailErr.style.display = bad ? 'block' : 'none';
+    });
+    passInput.addEventListener('blur', () => {
+      const bad = passInput.value.length < 6;
+      passInput.classList.toggle('error', bad);
+      passErr.style.display = bad ? 'block' : 'none';
+    });
+    form.addEventListener('submit', (e) => {
+      let valid = true;
+      if (!emailRegex.test(emailInput.value)) { emailInput.classList.add('error'); emailErr.style.display = 'block'; valid = false; }
+      if (passInput.value.length < 6) { passInput.classList.add('error'); passErr.style.display = 'block'; valid = false; }
+      if (!valid) e.preventDefault();
+    });
+  </script>
 </body>
 </html>

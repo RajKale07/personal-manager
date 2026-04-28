@@ -2,159 +2,1078 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - Personal Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Personal Manager</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --bg: #f7f1e7;
+      --surface: #fffaf2;
+      --surface-2: #f4eadb;
+      --surface-3: #efe2cf;
+      --border: #dfcfb8;
+      --border-2: #cdb89c;
+      --text: #2a2118;
+      --muted: #6f6254;
+      --muted-2: #8a7b69;
+      --accent: #b86c24;
+      --accent-2: #9f581c;
+      --success: #2f855a;
+      --success-bg: #e8f4ec;
+      --warning: #b7791f;
+      --warning-bg: #fdf1d8;
+      --danger: #b03a2e;
+      --danger-bg: #fde8e6;
+      --shadow: 0 10px 28px rgba(61, 43, 23, 0.08);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
-    .header { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-left svg { width: 28px; height: 28px; color: #4f46e5; }
-    .header h1 { font-size: 22px; color: #333; }
-    .logout { display: flex; align-items: center; gap: 6px; background: #ef4444; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; }
-    .logout svg { width: 15px; height: 15px; }
-    .logout:hover { background: #dc2626; }
-    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .section { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    h2 { font-size: 16px; margin-bottom: 16px; color: #333; border-bottom: 2px solid #4f46e5; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-    h2 svg { width: 18px; height: 18px; color: #4f46e5; }
-    input, select { width: 100%; padding: 8px 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
-    button { width: 100%; padding: 10px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-    button:hover { background: #4338ca; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-    th { background: #f9fafb; font-weight: 600; color: #555; }
-    tr:hover td { background: #f5f3ff; }
-    .flash { background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
-    .empty { color: #999; font-size: 13px; text-align: center; padding: 20px; }
-    .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .high { background: #fee2e2; color: #b91c1c; }
-    .medium { background: #fef9c3; color: #854d0e; }
-    .low { background: #dcfce7; color: #166534; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #fbf6ee 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 250, 242, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(223, 207, 184, 0.9);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .nav-brand svg { width: 24px; height: 24px; color: var(--accent); flex-shrink: 0; }
+    .nav-brand-name {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .nav-brand-name span { color: var(--accent); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      max-width: 260px;
+    }
+    .nav-user svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent); }
+    .nav-user strong {
+      color: var(--text);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .logout-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .logout-btn svg { width: 15px; height: 15px; }
+    .logout-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 44px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .hero-card, .card, .advisor-card, .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 180px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.1;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 60ch;
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--surface-2);
+      color: var(--accent);
+    }
+    .stat-icon svg { width: 20px; height: 20px; }
+
+    .stat-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .card-header h2 {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .flash {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid rgba(47, 133, 90, 0.18);
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .flash svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--warning-bg);
+      color: #7a4f11;
+      border: 1px solid rgba(183, 121, 31, 0.2);
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted-2);
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(184, 108, 36, 0.12);
+    }
+
+    input::placeholder { color: #a79b8a; }
+
+    .help {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background: var(--accent-2);
+      transform: translateY(-1px);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button-row .btn { width: auto; }
+
+    .quick-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .advisor-card {
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .advisor-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .advisor-summary {
+      background: linear-gradient(180deg, #fff8ee 0%, #fffdf9 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .advisor-name {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .advisor-sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .progress-wrap {
+      margin-top: 8px;
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .progress-pct {
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--surface-3);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c98a3c 0%, #a66420 100%);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 800;
+      color: var(--muted-2);
+      margin-bottom: 12px;
+    }
+
+    .procedure-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .procedure-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .doc-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .tag svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .tag.owned {
+      color: var(--success);
+      border-color: rgba(47, 133, 90, 0.2);
+      background: var(--success-bg);
+    }
+    .tag.missing {
+      color: var(--danger);
+      border-color: rgba(176, 58, 46, 0.18);
+      background: var(--danger-bg);
+    }
+
+    .split-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .split-title h3 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .split-title span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mini-panel {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .mini-panel + .mini-panel { margin-top: 14px; }
+
+    .mini-panel table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--muted-2);
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(223, 207, 184, 0.8);
+      font-size: 13px;
+      color: var(--text);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: 0; }
+
+    tr:hover td { background: rgba(244, 234, 219, 0.45); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .high { background: var(--danger-bg); color: var(--danger); border-color: rgba(176, 58, 46, 0.18); }
+    .medium { background: var(--warning-bg); color: var(--warning); border-color: rgba(183, 121, 31, 0.18); }
+    .low { background: var(--success-bg); color: var(--success); border-color: rgba(47, 133, 90, 0.18); }
+
+    .badge-done {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: rgba(47, 133, 90, 0.18);
+    }
+
+    .badge-pending {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: rgba(183, 121, 31, 0.18);
+    }
+
+    .done-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .done-btn:hover {
+      border-color: var(--success);
+      color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .empty {
+      padding: 34px 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .empty svg {
+      width: 38px;
+      height: 38px;
+      color: var(--border-2);
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    .mb-18 { margin-bottom: 18px; }
+
+    @media (max-width: 1024px) {
+      .hero, .grid-2, .advisor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .navbar {
+        padding: 12px 14px;
+        height: auto;
+        gap: 12px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .nav-user {
+        max-width: calc(100vw - 140px);
+      }
+
+      .main {
+        padding: 16px 12px 28px;
+      }
+
+      .hero-card, .card, .advisor-card {
+        padding: 18px;
+        border-radius: 16px;
+      }
+
+      .card-header h2 {
+        font-size: 16px;
+      }
+
+      th, td {
+        padding: 10px 10px;
+      }
+
+      .procedure-list li {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
+  <nav class="navbar">
+    <div class="nav-brand">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
       </svg>
-      <h1>Welcome, {{ session.name }}</h1>
+      <div class="nav-brand-name">Personal<span>Manager</span></div>
     </div>
-    <a href="/logout" class="logout">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      Logout
-    </a>
-  </div>
-
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}
-  {% endwith %}
-
-  <div class="container">
-    <div class="section">
-      <h2>
+    <div class="nav-right">
+      <div class="nav-user">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        Add Document
-      </h2>
-    <div class="section">
-      <h2>
+        <strong>{{ session.name }}</strong>
+      </div>
+      <a href="/logout" class="logout-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
         </svg>
-        Add Document
-      </h2>
-      <form method="POST" action="/add_document">
-        <input type="text" name="document_name" placeholder="Document Name" required>
-        <input type="text" name="authority" placeholder="Authority" required>
-        <input type="date" name="issue_date" required>
-        <input type="date" name="expiry_date" required>
-        <select name="importance" required>
-          <option value="">Select Importance</option>
-          <option value="High">High</option>
-          <option value="Medium">Medium</option>
-          <option value="Low">Low</option>
-        </select>
-        <button type="submit">Add Document</button>
+        Sign Out
+      </a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Document issue advisor
+        </div>
+        <h1 class="hero-title">Type a document name and get the issue procedure instantly.</h1>
+        <p class="hero-subtitle">
+          Enter a document such as Passport, PAN Card, Aadhaar Card, Vehicle RC, or Driving License.
+          The dashboard will show the step-by-step process, required documents, what you already have, and what you still need.
+        </p>
+      </div>
+
+      <div class="hero-side">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div class="stat-val">{{ documents|length }}</div>
+            <div class="stat-label">Documents saved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="stat-val">{{ pending_tasks }}</div>
+            <div class="stat-label">Pending renewal tasks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="flash">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        {{ messages[0] }}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if advisor_message %}
+      <div class="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ advisor_message }}
+      </div>
+    {% endif %}
+
+    <div class="advisor-card mb-18">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <h2>Check a document issue flow</h2>
+      </div>
+
+      <form method="GET" action="/dashboard">
+        <div class="field">
+          <label>Document name</label>
+          <input
+            type="text"
+            name="document"
+            placeholder="Type a document name, for example Passport"
+            list="guide-options"
+            value="{{ selected_document_query }}"
+            required
+          >
+          <datalist id="guide-options">
+            {% for guide_name in guide_names %}
+            <option value="{{ guide_name }}"></option>
+            {% endfor %}
+          </datalist>
+          <div class="help">
+            Supported documents:
+            {% for guide_name in guide_names %}
+              {{ guide_name }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="submit" class="btn">Show issue procedure</button>
+        </div>
       </form>
+
+      {% if selected_guide %}
+      <div class="advisor-grid" style="margin-top: 18px;">
+        <div class="advisor-summary">
+          <div class="advisor-name">{{ selected_guide.name }}</div>
+          <div class="advisor-sub">
+            {% if selected_guide.document_owned %}
+              You already have this document saved in your profile. Below is the full issue guide and the remaining documents you need.
+            {% else %}
+              This is the issue guide for the document you entered. Below you can see the process, the required documents, what you already have, and what is still missing.
+            {% endif %}
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-head">
+              <span>Requirement readiness</span>
+              <span class="progress-pct">{{ selected_guide.readiness_pct }}%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" data-width="{{ selected_guide.readiness_pct }}"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-panel">
+          <div class="split-title">
+            <h3>What you already have</h3>
+            <span>{{ selected_guide.owned_required|length }} of {{ selected_guide.required|length }}</span>
+          </div>
+          <div class="doc-tags">
+            {% if selected_guide.owned_required %}
+              {% for req in selected_guide.owned_required %}
+              <span class="tag owned">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                {{ req }}
+              </span>
+              {% endfor %}
+            {% else %}
+              <span class="tag">No matching required documents saved yet</span>
+            {% endif %}
+          </div>
+
+          <div class="split-title" style="margin-top: 16px;">
+            <h3>What you still need</h3>
+            <span>{{ selected_guide.missing_required|length }} missing</span>
+          </div>
+          <div class="doc-tags">
+            {% if selected_guide.missing_required %}
+              {% for req in selected_guide.missing_required %}
+              <span class="tag missing">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                {{ req }}
+              </span>
+              {% endfor %}
+            {% else %}
+              <span class="tag owned">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                All required documents are available
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
-    <div class="section">
-      <h2>
+
+    {% if selected_guide %}
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
+          <h2>Procedure</h2>
+        </div>
+        <ol class="procedure-list">
+          {% for step in selected_guide.procedure %}
+          <li>
+            <span class="step-num">{{ loop.index }}</span>
+            <span>{{ step }}</span>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <h2>Required documents</h2>
+        </div>
+        <div class="doc-tags">
+          {% for req in selected_guide.required %}
+            {% if req in selected_guide.owned_required %}
+            <span class="tag owned">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              {{ req }}
+            </span>
+            {% else %}
+            <span class="tag missing">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              {{ req }}
+            </span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <h2>Add New Document</h2>
+        </div>
+        <form method="POST" action="/add_document">
+          <div class="field">
+            <label>Document Name</label>
+            <input type="text" name="document_name" placeholder="e.g. Passport, Aadhaar" required>
+          </div>
+          <div class="field">
+            <label>Issuing Authority</label>
+            <input type="text" name="authority" placeholder="e.g. Government, RTO, UIDAI" required>
+          </div>
+          <div class="field">
+            <label>Issue Date</label>
+            <input type="date" name="issue_date" required>
+          </div>
+          <div class="field">
+            <label>Expiry Date</label>
+            <input type="date" name="expiry_date" required>
+          </div>
+          <div class="field">
+            <label>Importance</label>
+            <select name="importance" required>
+              <option value="">Select level</option>
+              <option value="High">High — Critical document</option>
+              <option value="Medium">Medium — Important</option>
+              <option value="Low">Low — Optional</option>
+            </select>
+          </div>
+          <button class="btn" type="submit">Add Document</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <h2>My Documents</h2>
+        </div>
+        {% if documents %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Document</th>
+                <th>Authority</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th>Importance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for doc in documents %}
+              <tr>
+                <td>{{ doc[2] }}</td>
+                <td>{{ doc[3] }}</td>
+                <td>{{ doc[4] }}</td>
+                <td>{{ doc[5] }}</td>
+                <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          No documents added yet. Add your first document to start tracking issue readiness.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
         </svg>
-        Add Goal
-      </h2>
-      <form method="POST" action="/add_goal">
-        <input type="text" name="goal_name" placeholder="Goal Name" required>
-        <input type="date" name="start_date" required>
-        <input type="date" name="target_date" required>
-        <input type="number" name="progress" placeholder="Progress (0-100)" min="0" max="100" required>
-        <input type="text" name="status" placeholder="Status" required>
-        <button type="submit">Add Goal</button>
-      </form>
+        <h2>Renewal Tasks</h2>
+      </div>
+      {% if tasks %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Expiry Date</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+            <tr>
+              <td>{{ task[1] }}</td>
+              <td>{{ task[2] }}</td>
+              <td>{{ task[3] }}</td>
+              <td><span class="badge {{ 'badge-done' if task[4] == 'Done' else 'badge-pending' }}">{{ task[4] }}</span></td>
+              <td>
+                {% if task[4] == 'Pending' %}
+                <form method="POST" action="/task/done/{{ task[0] }}" style="display:inline;">
+                  <button class="done-btn" type="submit">Mark Done</button>
+                </form>
+                {% else %}
+                —
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        No tasks yet. Renewal tasks are created automatically when a document expires.
+      </div>
+      {% endif %}
     </div>
   </div>
-
-  <div class="section" style="margin-top: 20px;">
-    <h2>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-      </svg>
-      My Documents
-    </h2>
-    {% if documents %}
-    <table>
-      <tr><th>Name</th><th>Authority</th><th>Issue Date</th><th>Expiry Date</th><th>Importance</th></tr>
-      {% for doc in documents %}
-      <tr><td>{{ doc[2] }}</td><td>{{ doc[3] }}</td><td>{{ doc[4] }}</td><td>{{ doc[5] }}</td>
-        <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td></tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty">No documents yet.</div>
-    {% endif %}
-  </div>
-
-  <div class="section" style="margin-top: 20px;">
-    <h2>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      My Goals
-    </h2>
-    {% if goals %}
-    <table>
-      <tr><th>Goal</th><th>Start</th><th>Target</th><th>Progress</th><th>Status</th></tr>
-      {% for goal in goals %}
-      <tr><td>{{ goal[2] }}</td><td>{{ goal[3] }}</td><td>{{ goal[4] }}</td><td>{{ goal[5] }}%</td><td>{{ goal[6] }}</td></tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty">No goals yet.</div>
-    {% endif %}
-  </div>
-
-  <div class="section" style="margin-top: 20px;">
-    <h2>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-      </svg>
-      Upcoming Deadlines (Next 7 Days)
-    </h2>
-    {% if deadlines %}
-    <table>
-      <tr><th>Title</th><th>Description</th><th>Due Date</th><th>Status</th></tr>
-      {% for dl in deadlines %}
-      <tr><td>{{ dl[2] }}</td><td>{{ dl[3] }}</td><td>{{ dl[4] }}</td><td>{{ dl[5] }}</td></tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty">No upcoming deadlines.</div>
-    {% endif %}
-  </div>
+  <script>
+    document.querySelectorAll('.bar-fill[data-width]').forEach(function (el) {
+      el.style.width = el.getAttribute('data-width') + '%';
+    });
+  </script>
 </body>
 </html>
