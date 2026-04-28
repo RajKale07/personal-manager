@@ -18,133 +18,70 @@ def get_db():
     )
 
 
-# Document issue guide data — procedure + required docs for each document type
-ISSUE_GUIDE = {
-    "Passport": {
-        "procedure": [
-            "Fill Form-1 online at passportindia.gov.in",
-            "Book appointment at nearest Passport Seva Kendra",
-            "Visit PSK with original documents on appointment date",
-            "Biometric data and photo will be captured",
-            "Police verification will be conducted",
-            "Passport delivered to your address within 7-14 days",
-        ],
-        "required": ["Aadhaar Card", "Birth Certificate", "10th Marksheet", "Address Proof"],
-    },
-    "Driving License": {
-        "procedure": [
-            "Apply for Learner's License at sarathi.parivahan.gov.in",
-            "Pass the online theory test",
-            "Wait 30 days after Learner's License",
-            "Book driving test slot at RTO",
-            "Appear for practical driving test at RTO",
-            "License issued if test passed",
-        ],
-        "required": ["Aadhaar Card", "Address Proof", "Age Proof", "Passport Photo"],
-    },
-    "Aadhaar Card": {
-        "procedure": [
-            "Visit nearest Aadhaar Enrollment Centre",
-            "Fill enrollment form",
-            "Submit biometric data (fingerprints + iris scan)",
-            "Get acknowledgement slip with enrollment ID",
-            "Download e-Aadhaar from uidai.gov.in after 90 days",
-        ],
-        "required": ["Birth Certificate", "Address Proof", "Passport Photo"],
-    },
-    "PAN Card": {
-        "procedure": [
-            "Apply online at tin-nsdl.com or utiitsl.com",
-            "Fill Form 49A with personal details",
-            "Upload photo, signature and supporting documents",
-            "Pay application fee online",
-            "PAN card delivered within 15 working days",
-        ],
-        "required": ["Aadhaar Card", "Birth Certificate", "Address Proof", "Passport Photo"],
-    },
-    "Voter ID": {
-        "procedure": [
-            "Apply online at voters.eci.gov.in",
-            "Fill Form 6 for new registration",
-            "Upload required documents",
-            "BLO will verify your details at your address",
-            "Voter ID card issued after verification",
-        ],
-        "required": ["Aadhaar Card", "Address Proof", "Passport Photo", "Age Proof"],
-    },
-    "Vehicle RC": {
-        "procedure": [
-            "Visit RTO with vehicle and documents",
-            "Fill Form 20 for registration",
-            "Vehicle inspection by RTO officer",
-            "Pay registration fee",
-            "RC issued within 7 working days",
-        ],
-        "required": ["Driving License", "Insurance Policy", "Address Proof", "PAN Card"],
-    },
-    "Insurance Policy": {
-        "procedure": [
-            "Compare plans on insurance aggregator websites",
-            "Choose plan based on coverage and premium",
-            "Fill proposal form with personal and health details",
-            "Pay premium online",
-            "Policy document sent to registered email",
-        ],
-        "required": ["Aadhaar Card", "PAN Card", "Address Proof", "Passport Photo"],
-    },
-    "Birth Certificate": {
-        "procedure": [
-            "Apply at Municipal Corporation / Gram Panchayat office",
-            "Fill birth registration form",
-            "Submit hospital discharge summary",
-            "Certificate issued within 7 days of application",
-        ],
-        "required": ["Hospital Discharge Summary", "Parents Aadhaar Card", "Address Proof"],
-    },
-}
-
-
 def normalize_text(value):
     return value.strip().lower() if value else ""
 
 
-def find_guide(document_query):
+def load_issue_guide(cursor):
+    """Load full issue guide from DB — returns dict keyed by document_name."""
+    cursor.execute("SELECT guide_id, document_name FROM issue_guide ORDER BY document_name")
+    guides = cursor.fetchall()
+
+    guide = {}
+    for guide_id, doc_name in guides:
+        cursor.execute(
+            "SELECT step_text FROM issue_guide_steps WHERE guide_id = %s ORDER BY step_order",
+            (guide_id,),
+        )
+        steps = [row[0] for row in cursor.fetchall()]
+
+        cursor.execute(
+            "SELECT required_document FROM issue_guide_required WHERE guide_id = %s",
+            (guide_id,),
+        )
+        required = [row[0] for row in cursor.fetchall()]
+
+        guide[doc_name] = {"procedure": steps, "required": required}
+
+    return guide
+
+
+def build_issue_advisor(document_query, user_doc_names, issue_guide):
     query = normalize_text(document_query)
     if not query:
         return None, None
 
-    for doc_name, info in ISSUE_GUIDE.items():
+    # Exact match first, then partial
+    matched_name = None
+    for doc_name in issue_guide:
         if normalize_text(doc_name) == query:
-            return doc_name, info
+            matched_name = doc_name
+            break
+    if not matched_name:
+        for doc_name in issue_guide:
+            if query in normalize_text(doc_name):
+                matched_name = doc_name
+                break
 
-    for doc_name, info in ISSUE_GUIDE.items():
-        if query in normalize_text(doc_name):
-            return doc_name, info
-
-    return None, None
-
-
-def build_issue_advisor(document_query, user_doc_names):
-    selected_name, info = find_guide(document_query)
-    if not selected_name:
+    if not matched_name:
         return None, None
 
+    info = issue_guide[matched_name]
     owned_set = set(user_doc_names)
     required = info["required"]
-    owned_required = [req for req in required if normalize_text(req) in owned_set]
-    missing_required = [req for req in required if normalize_text(req) not in owned_set]
-    readiness_total = len(required)
-    readiness_pct = int((len(owned_required) / readiness_total) * 100) if readiness_total else 0
+    owned_required = [r for r in required if normalize_text(r) in owned_set]
+    missing_required = [r for r in required if normalize_text(r) not in owned_set]
+    readiness_pct = int(len(owned_required) / len(required) * 100) if required else 0
 
     return {
-        "name": selected_name,
+        "name": matched_name,
         "procedure": info["procedure"],
         "required": required,
         "owned_required": owned_required,
         "missing_required": missing_required,
         "readiness_pct": readiness_pct,
-        "document_owned": normalize_text(selected_name) in owned_set,
-    }, selected_name
+        "document_owned": normalize_text(matched_name) in owned_set,
+    }, matched_name
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -245,12 +182,13 @@ def dashboard():
     )
     tasks = cursor.fetchall()
 
+    issue_guide = load_issue_guide(cursor)
     cursor.close()
     conn.close()
 
     user_doc_names = [normalize_text(doc[2]) for doc in documents]
     selected_document_query = request.args.get("document", "").strip()
-    selected_guide, selected_document_name = build_issue_advisor(selected_document_query, user_doc_names)
+    selected_guide, selected_document_name = build_issue_advisor(selected_document_query, user_doc_names, issue_guide)
     advisor_message = None
 
     if selected_document_query and not selected_guide:
@@ -270,7 +208,7 @@ def dashboard():
         tasks=tasks,
         notif_count=notif_count,
         pending_tasks=pending_tasks,
-        guide_names=sorted(ISSUE_GUIDE.keys()),
+        guide_names=sorted(issue_guide.keys()),
         selected_document_query=selected_document_query,
         selected_guide=selected_guide,
         selected_document_name=selected_document_name,
