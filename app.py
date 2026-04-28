@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
 from datetime import date
 
 app = Flask(__name__)
 app.secret_key = "personal_manager_secret"
+ADMIN_EMAIL = "admin@example.com"
 
 
 def get_db():
@@ -23,25 +24,32 @@ def normalize_text(value):
 
 
 def load_issue_guide(cursor):
-    """Load full issue guide from DB — returns dict keyed by document_name."""
-    cursor.execute("SELECT guide_id, document_name FROM issue_guide ORDER BY document_name")
-    guides = cursor.fetchall()
+    """Load full issue guide from DB using 2 queries instead of N+1."""
+    cursor.execute(
+        "SELECT g.guide_id, g.document_name, s.step_text "
+        "FROM issue_guide g "
+        "JOIN issue_guide_steps s ON g.guide_id = s.guide_id "
+        "ORDER BY g.document_name, s.step_order"
+    )
+    steps_rows = cursor.fetchall()
+
+    cursor.execute(
+        "SELECT g.guide_id, g.document_name, r.required_document "
+        "FROM issue_guide g "
+        "JOIN issue_guide_required r ON g.guide_id = r.guide_id "
+        "ORDER BY g.document_name"
+    )
+    req_rows = cursor.fetchall()
 
     guide = {}
-    for guide_id, doc_name in guides:
-        cursor.execute(
-            "SELECT step_text FROM issue_guide_steps WHERE guide_id = %s ORDER BY step_order",
-            (guide_id,),
-        )
-        steps = [row[0] for row in cursor.fetchall()]
+    for guide_id, doc_name, step_text in steps_rows:
+        if doc_name not in guide:
+            guide[doc_name] = {"procedure": [], "required": []}
+        guide[doc_name]["procedure"].append(step_text)
 
-        cursor.execute(
-            "SELECT required_document FROM issue_guide_required WHERE guide_id = %s",
-            (guide_id,),
-        )
-        required = [row[0] for row in cursor.fetchall()]
-
-        guide[doc_name] = {"procedure": steps, "required": required}
+    for guide_id, doc_name, req_doc in req_rows:
+        if doc_name in guide:
+            guide[doc_name]["required"].append(req_doc)
 
     return guide
 
@@ -99,7 +107,7 @@ def login():
         if user and user[2] == password:
             session["user_id"] = user[0]
             session["name"] = user[1]
-            session["is_admin"] = email == "admin@example.com"
+            session["is_admin"] = (email == ADMIN_EMAIL)
             return redirect(url_for("admin" if session["is_admin"] else "dashboard"))
 
         flash("Invalid email or password.")
@@ -248,6 +256,53 @@ def add_document():
     return redirect(url_for("dashboard"))
 
 
+@app.route("/document/delete/<int:doc_id>", methods=["POST"])
+def delete_document(doc_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM documents WHERE document_id = %s AND user_id = %s",
+        (doc_id, session["user_id"]),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash("Document deleted.")
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/document/edit/<int:doc_id>", methods=["POST"])
+def edit_document(doc_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE documents SET document_name=%s, authority=%s, issue_date=%s, expiry_date=%s, importance=%s "
+            "WHERE document_id=%s AND user_id=%s",
+            (
+                request.form["document_name"],
+                request.form["authority"],
+                request.form["issue_date"],
+                request.form["expiry_date"],
+                request.form["importance"],
+                doc_id,
+                session["user_id"],
+            ),
+        )
+        conn.commit()
+        flash("Document updated successfully!")
+    except Exception as exc:
+        flash(f"Error: {exc}")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for("dashboard"))
+
+
 @app.route("/task/done/<int:task_id>", methods=["POST"])
 def mark_task_done(task_id):
     if "user_id" not in session:
@@ -325,7 +380,7 @@ def logout():
 
 @app.route("/favicon.ico")
 def favicon():
-    return make_response("", 204)
+    return "", 204
 
 
 if __name__ == "__main__":
