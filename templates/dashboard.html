@@ -1020,7 +1020,17 @@
         <form method="POST" action="/add_document">
           <div class="field">
             <label>Document Name</label>
-            <input type="text" name="document_name" placeholder="e.g. Passport, Aadhaar" required>
+            <select name="document_name" id="doc_name_select" required onchange="toggleCustomName(this)">
+              <option value="">Select document</option>
+              {% for guide_name in guide_names %}
+              <option value="{{ guide_name }}">{{ guide_name }}</option>
+              {% endfor %}
+              <option value="__other__">Other (type manually)</option>
+            </select>
+          </div>
+          <div class="field" id="custom_name_field" style="display:none;">
+            <label>Custom Document Name</label>
+            <input type="text" name="custom_document_name" id="custom_document_name" placeholder="Enter document name">
           </div>
           <div class="field">
             <label>Issuing Authority</label>
@@ -1193,6 +1203,19 @@
     document.querySelectorAll('.bar-fill[data-width]').forEach(function (el) {
       el.style.width = el.getAttribute('data-width') + '%';
     });
+
+    function toggleCustomName(select) {
+      const customField = document.getElementById('custom_name_field');
+      const customInput = document.getElementById('custom_document_name');
+      if (select.value === '__other__') {
+        customField.style.display = 'block';
+        customInput.required = true;
+      } else {
+        customField.style.display = 'none';
+        customInput.required = false;
+        customInput.value = '';
+      }
+    }
 
     function openEdit(id, name, authority, issueDate, expiryDate, importance) {
       document.getElementById('editForm').action = '/document/edit/' + id;
