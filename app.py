@@ -332,15 +332,81 @@ def admin():
     if "user_id" not in session or not session.get("is_admin"):
         return redirect(url_for("login"))
 
+    search = request.args.get("search", "").strip()
+    view_user_id = request.args.get("user_id", "").strip()
+
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id, name, email, created_date FROM users")
+    cursor.execute("SELECT user_id, name, email, created_date FROM users ORDER BY user_id")
     users = cursor.fetchall()
-    cursor.execute("SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id")
-    documents = cursor.fetchall()
+
+    # Filter users by search
+    filtered_users = users
+    if search:
+        sl = search.lower()
+        filtered_users = [u for u in users if sl in u[1].lower() or sl in u[2].lower() or sl == str(u[0])]
+
+    # Documents: show for specific user or all
+    selected_user = None
+    if view_user_id and view_user_id.isdigit():
+        cursor.execute(
+            "SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id "
+            "WHERE d.user_id = %s ORDER BY d.expiry_date",
+            (int(view_user_id),),
+        )
+        cursor.execute("SELECT user_id, name, email FROM users WHERE user_id = %s", (int(view_user_id),))
+        selected_user = cursor.fetchone()
+        cursor.execute(
+            "SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id "
+            "WHERE d.user_id = %s ORDER BY d.expiry_date",
+            (int(view_user_id),),
+        )
+        documents = cursor.fetchall()
+    else:
+        cursor.execute("SELECT d.*, u.name FROM documents d JOIN users u ON d.user_id = u.user_id ORDER BY u.name, d.expiry_date")
+        documents = cursor.fetchall()
+
     cursor.close()
     conn.close()
-    return render_template("admin.html", users=users, documents=documents)
+    return render_template(
+        "admin.html",
+        users=users,
+        filtered_users=filtered_users,
+        documents=documents,
+        search=search,
+        view_user_id=view_user_id,
+        selected_user=selected_user,
+    )
+
+
+@app.route("/admin/user/<int:uid>/edit", methods=["POST"])
+def admin_edit_user(uid):
+    if "user_id" not in session or not session.get("is_admin"):
+        return redirect(url_for("login"))
+    name = request.form["name"].strip()
+    email = request.form["email"].strip()
+    new_password = request.form.get("new_password", "").strip()
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        if new_password:
+            cursor.execute(
+                "UPDATE users SET name=%s, email=%s, password=%s WHERE user_id=%s",
+                (name, email, new_password, uid),
+            )
+        else:
+            cursor.execute(
+                "UPDATE users SET name=%s, email=%s WHERE user_id=%s",
+                (name, email, uid),
+            )
+        conn.commit()
+        flash(f"User #{uid} updated successfully.")
+    except Exception as exc:
+        flash(f"Error: {exc}")
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for("admin"))
 
 
 @app.route("/forgot-password", methods=["GET", "POST"])
