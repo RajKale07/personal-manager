@@ -343,6 +343,42 @@ def admin():
     return render_template("admin.html", users=users, documents=documents)
 
 
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = request.form["email"].strip()
+        new_password = request.form["new_password"]
+        confirm_password = request.form["confirm_password"]
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "err")
+            return render_template("forgot_password.html")
+
+        if len(new_password) < 6:
+            flash("Password must be at least 6 characters.", "err")
+            return render_template("forgot_password.html")
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            cursor.close()
+            conn.close()
+            flash("No account found with that email address.", "err")
+            return render_template("forgot_password.html")
+
+        cursor.execute("UPDATE users SET password = %s WHERE email = %s", (new_password, email))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash("Password reset successfully! You can now sign in.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
+
 @app.route("/logout")
 def logout():
     session.clear()
