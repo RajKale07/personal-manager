@@ -2,87 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Panel - Personal Manager</title>
+  <title>Admin Panel — Personal Manager</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --bg: #f7f1e7;
+      --surface: #fffaf2;
+      --surface-2: #f4eadb;
+      --surface-3: #efe2cf;
+      --border: #dfcfb8;
+      --border-2: #cdb89c;
+      --text: #2a2118;
+      --muted: #6f6254;
+      --muted-2: #8a7b69;
+      --accent: #b86c24;
+      --accent-2: #9f581c;
+      --success: #2f855a;
+      --success-bg: #e8f4ec;
+      --warning: #b7791f;
+      --warning-bg: #fdf1d8;
+      --danger: #b03a2e;
+      --danger-bg: #fde8e6;
+      --shadow: 0 10px 28px rgba(61, 43, 23, 0.08);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
-    .header { background: #1e1b4b; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-left svg { width: 28px; height: 28px; color: #a5b4fc; }
-    .header h1 { font-size: 22px; color: white; }
-    .logout { display: flex; align-items: center; gap: 6px; background: #ef4444; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; }
-    .logout svg { width: 15px; height: 15px; }
-    .logout:hover { background: #dc2626; }
-    .section { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    h2 { font-size: 16px; margin-bottom: 16px; color: #333; border-bottom: 2px solid #1e1b4b; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-    h2 svg { width: 18px; height: 18px; color: #1e1b4b; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, #fbf6ee 0%, var(--bg) 100%); color: var(--text); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    .navbar { background: rgba(255, 250, 242, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(223, 207, 184, 0.9); padding: 0 28px; height: 68px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-brand svg { width: 24px; height: 24px; color: var(--accent); }
+    .nav-brand-name { font-family: 'Lora', serif; font-size: 18px; font-weight: 700; color: var(--text); }
+    .nav-brand-name span { color: var(--accent); }
+    .admin-tag { font-size: 11px; font-weight: 700; background: var(--surface-2); color: var(--accent); padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border); }
+    .logout-btn { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 9px 14px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .logout-btn svg { width: 14px; height: 14px; }
+    .logout-btn:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+    .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+    .page-title { font-family: 'Lora', serif; font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
+    .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--surface-2); }
+    .stat-icon svg { width: 20px; height: 20px; color: var(--accent); }
+    .stat-icon.users { background: var(--surface-2); }
+    .stat-icon.docs { background: var(--surface-2); }
+    .stat-val { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 24px; overflow: hidden; box-shadow: var(--shadow); }
+    .card-header { display: flex; align-items: center; gap: 8px; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+    .card-header svg { width: 17px; height: 17px; color: var(--accent); }
+    .card-header h2 { font-family: 'Lora', serif; font-size: 16px; font-weight: 700; color: var(--text); }
     table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-    th { background: #f9fafb; font-weight: 600; color: #555; }
-    tr:hover td { background: #f5f3ff; }
-    .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .high { background: #fee2e2; color: #b91c1c; }
-    .medium { background: #fef9c3; color: #854d0e; }
-    .low { background: #dcfce7; color: #166534; }
-    .empty { color: #999; font-size: 13px; text-align: center; padding: 20px; }
+    th { padding: 10px 20px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+    td { padding: 13px 20px; font-size: 13px; color: var(--text); border-bottom: 1px solid rgba(223, 207, 184, 0.8); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(244, 234, 219, 0.45); }
+    .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .high { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(176, 58, 46, 0.18); }
+    .medium { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(183, 121, 31, 0.18); }
+    .low { background: var(--success-bg); color: var(--success); border: 1px solid rgba(47, 133, 90, 0.18); }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="header-left">
+  <nav class="navbar">
+    <div class="nav-brand">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
       </svg>
-      <h1>Admin Panel</h1>
+      <div class="nav-brand-name">Personal<span>Manager</span></div>
+      <span class="admin-tag">Admin</span>
     </div>
-    <a href="/logout" class="logout">
+    <a href="/logout" class="logout-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
       </svg>
-      Logout
+      Sign Out
     </a>
-  </div>
+  </nav>
 
-  <div class="section">
-    <h2>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      All Users
-    </h2>
-    {% if users %}
-    <table>
-      <tr><th>ID</th><th>Name</th><th>Email</th><th>Joined</th></tr>
-      {% for user in users %}
-      <tr><td>{{ user[0] }}</td><td>{{ user[1] }}</td><td>{{ user[2] }}</td><td>{{ user[3] }}</td></tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty">No users found.</div>
-    {% endif %}
-  </div>
+  <div class="main">
+    <div class="page-title">Admin Panel</div>
+    <div class="page-sub">Overview of all users and their documents</div>
 
-  <div class="section">
-    <h2>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-      </svg>
-      All Documents
-    </h2>
-    {% if documents %}
-    <table>
-      <tr><th>User</th><th>Document</th><th>Authority</th><th>Issue Date</th><th>Expiry Date</th><th>Importance</th></tr>
-      {% for doc in documents %}
-      <tr>
-        <td>{{ doc[7] }}</td><td>{{ doc[2] }}</td><td>{{ doc[3] }}</td>
-        <td>{{ doc[4] }}</td><td>{{ doc[5] }}</td>
-        <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty">No documents found.</div>
-    {% endif %}
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-icon users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-val">{{ users|length }}</div>
+          <div class="stat-label">Registered Users</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon docs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-val">{{ documents|length }}</div>
+          <div class="stat-label">Total Documents</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <h2>All Users</h2>
+      </div>
+      {% if users %}
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Joined</th></tr></thead>
+        <tbody>
+          {% for user in users %}
+          <tr><td>{{ user[0] }}</td><td>{{ user[1] }}</td><td>{{ user[2] }}</td><td>{{ user[3] }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">No users found.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <h2>All Documents</h2>
+      </div>
+      {% if documents %}
+      <table>
+        <thead><tr><th>User</th><th>Document</th><th>Authority</th><th>Issue Date</th><th>Expiry Date</th><th>Importance</th></tr></thead>
+        <tbody>
+          {% for doc in documents %}
+          <tr>
+            <td>{{ doc[7] }}</td><td>{{ doc[2] }}</td><td>{{ doc[3] }}</td>
+            <td>{{ doc[4] }}</td><td>{{ doc[5] }}</td>
+            <td><span class="badge {{ doc[6]|lower }}">{{ doc[6] }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">No documents found.</div>
+      {% endif %}
+    </div>
   </div>
 </body>
 </html>
