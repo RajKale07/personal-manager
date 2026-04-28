@@ -26,8 +26,9 @@ A web-based personal document management system built with **Flask** and **MySQL
 - Expiry notifications — urgent banner for documents expiring within 7 days, warning for within 30 days
 - Expired document tracking with auto-created renewal tasks
 - Task management — view pending renewal tasks and mark them as done
-- Search-driven Issue Guide — type any document name to get the full issue procedure, required documents, what you already have, and what you still need
+- Search-driven Issue Guide — type any document name to get the full issue procedure, required documents, what you already have, and what you still need (fully dynamic, stored in DB)
 - Readiness progress bar showing how many required documents you already own
+- Forgot password — reset password by verifying registered email
 - Admin panel — view all registered users and all documents across the system
 - Light cream UI theme with responsive layout
 
@@ -49,14 +50,15 @@ A web-based personal document management system built with **Flask** and **MySQL
 
 ```
 DBMS/
-├── app.py                  # Flask backend — all routes, DB logic, ISSUE_GUIDE data
-├── setup_database.sql      # Complete MySQL schema + sample data (run this first)
-├── README.md               # This file
+├── app.py                   # Flask backend — all routes and DB logic
+├── setup_database.sql       # Complete MySQL schema + sample data (run this first)
+├── README.md                # This file
 └── templates/
-    ├── login.html          # Login page
-    ├── register.html       # Register page
-    ├── dashboard.html      # User dashboard — documents, tasks, issue guide
-    └── admin.html          # Admin panel
+    ├── login.html           # Login page
+    ├── register.html        # Register page
+    ├── forgot_password.html # Reset password page
+    ├── dashboard.html       # User dashboard — documents, tasks, issue guide
+    └── admin.html           # Admin panel
 ```
 
 ---
@@ -65,22 +67,18 @@ DBMS/
 
 ### Tables
 
-| Table       | Key Columns                                                                          |
-|-------------|--------------------------------------------------------------------------------------|
-| `users`     | user_id, name, email, password, created_date                                         |
-| `documents` | document_id, user_id, document_name, authority, issue_date, expiry_date, importance  |
-| `tasks`     | task_id, user_id, document_id (FK), task_type, status                                |
-| `deadlines` | deadline_id, user_id, title, description, due_date, status                           |
-| `goals`     | goal_id, user_id, goal_name, start_date, target_date, progress, status               |
-| `contacts`  | contact_id, user_id, contact_name, relationship, phone                               |
+| Table                  | Key Columns                                                                         |
+|------------------------|-------------------------------------------------------------------------------------|
+| `users`                | user_id, name, email, password, created_date                                        |
+| `documents`            | document_id, user_id, document_name, authority, issue_date, expiry_date, importance |
+| `tasks`                | task_id, user_id, document_id (FK), task_type, status                               |
+| `issue_guide`          | guide_id, document_name                                                             |
+| `issue_guide_steps`    | step_id, guide_id (FK), step_order, step_text                                       |
+| `issue_guide_required` | req_id, guide_id (FK), required_document                                            |
 
 ### View
 
 - **`expiring_documents`** — returns all documents with expiry date within the next 30 days
-
-### Stored Procedure
-
-- **`get_upcoming_deadlines()`** — returns deadlines due within the next 7 days
 
 ---
 
@@ -93,24 +91,31 @@ DBMS/
 - Otherwise the user is redirected to the Dashboard
 - Session stores `user_id`, `name`, and `is_admin`
 
-### 2. Dashboard
+### 2. Forgot Password
+- User visits `/forgot-password` and enters their registered email
+- System verifies the email exists in the DB
+- If valid, the password is updated with the new one entered
+- User is redirected to login with a success message
+
+### 3. Dashboard
 - Shows stats — total documents saved and pending renewal tasks
 - Shows expiry notification banners at the top if any documents are expiring soon
-- Three sections: Add Document form, My Documents table, Renewal Tasks table
-- Issue Guide search box at the top — type a document name to get the full guide
+- Sections: Add Document form, My Documents table, Renewal Tasks table
+- Issue Guide search box — type a document name to get the full guide
 
-### 3. Expiry Notifications
+### 4. Expiry Notifications
 - Urgent banner (red) for documents expiring within 7 days
 - Warning banner (amber) for documents expiring within 8–30 days
 - Both banners list each document with the exact number of days remaining
 
-### 4. Renewal Tasks
+### 5. Renewal Tasks
 - When a document's expiry date passes, a `Renew` task is automatically created for it
 - Duplicate tasks are prevented — the system checks before inserting
 - Users can mark tasks as Done from the dashboard
 
-### 5. Issue Guide
+### 6. Issue Guide
 - User types a document name (e.g. Passport, PAN Card, Driving License) in the search box
+- All guide data is loaded from the DB (`issue_guide`, `issue_guide_steps`, `issue_guide_required`)
 - The dashboard shows:
   - Step-by-step procedure to obtain that document
   - Full list of required documents
@@ -118,7 +123,7 @@ DBMS/
   - Which required documents are still missing (red tags)
   - A readiness progress bar showing the percentage of requirements met
 
-### 6. Admin Panel
+### 7. Admin Panel
 - Only accessible when logged in as `admin@example.com`
 - Shows total user count and total document count
 - Table of all registered users
@@ -142,7 +147,7 @@ pip install flask mysql-connector-python
 ```
 mysql -u root -p < "path\to\setup_database.sql"
 ```
-This creates the `personal_manager` database, all tables, the view, the stored procedure, and inserts sample data.
+This creates the `personal_manager` database, all tables, the view, and inserts sample data including the full issue guide.
 
 ### Step 3 — Create the admin account
 Run this in MySQL after setup:
@@ -168,7 +173,7 @@ Open your browser at `http://127.0.0.1:5000`
 ## Sample Login Credentials
 
 | Role  | Email              | Password     |
-|-------|--------------------|--------------|
+|-------|--------------------|--------------|\
 | User  | john@example.com   | password123  |
 | User  | jane@example.com   | password456  |
 | Admin | admin@example.com  | admin123     |
@@ -181,6 +186,7 @@ Open your browser at `http://127.0.0.1:5000`
 |--------------------------|-----------|------------------------------------------|
 | `/`                      | GET, POST | Login page                               |
 | `/register`              | GET, POST | Register a new user                      |
+| `/forgot-password`       | GET, POST | Reset password by email verification     |
 | `/dashboard`             | GET       | User dashboard                           |
 | `/dashboard?document=X`  | GET       | Dashboard with issue guide result for X  |
 | `/add_document`          | POST      | Add a new document                       |
@@ -192,18 +198,18 @@ Open your browser at `http://127.0.0.1:5000`
 
 ## Issue Guide — Supported Documents
 
-The built-in issue guide covers the following Indian government documents:
+The issue guide data is stored in the database and can be updated directly via MySQL. Currently covers:
 
-| Document          | Key Required Documents                                      |
-|-------------------|-------------------------------------------------------------|
+| Document          | Key Required Documents                                         |
+|-------------------|----------------------------------------------------------------|
 | Passport          | Aadhaar Card, Birth Certificate, 10th Marksheet, Address Proof |
-| Driving License   | Aadhaar Card, Address Proof, Age Proof, Passport Photo      |
-| Aadhaar Card      | Birth Certificate, Address Proof, Passport Photo            |
+| Driving License   | Aadhaar Card, Address Proof, Age Proof, Passport Photo         |
+| Aadhaar Card      | Birth Certificate, Address Proof, Passport Photo               |
 | PAN Card          | Aadhaar Card, Birth Certificate, Address Proof, Passport Photo |
-| Voter ID          | Aadhaar Card, Address Proof, Passport Photo, Age Proof      |
-| Vehicle RC        | Driving License, Insurance Policy, Address Proof, PAN Card  |
-| Insurance Policy  | Aadhaar Card, PAN Card, Address Proof, Passport Photo       |
-| Birth Certificate | Hospital Discharge Summary, Parents Aadhaar Card, Address Proof |
+| Voter ID          | Aadhaar Card, Address Proof, Passport Photo, Age Proof         |
+| Vehicle RC        | Driving License, Insurance Policy, Address Proof, PAN Card     |
+| Insurance Policy  | Aadhaar Card, PAN Card, Address Proof, Passport Photo          |
+| Birth Certificate | Hospital Discharge Summary, Parents Aadhaar Card, Address Proof|
 
 ---
 
@@ -213,4 +219,4 @@ The built-in issue guide covers the following Indian government documents:
 - No email notifications — expiry reminders are shown on the dashboard only
 - No CSRF protection on POST routes
 - `debug=True` is set in `app.run()` — must be disabled before any deployment
-- `goals`, `deadlines`, and `contacts` tables exist in the DB but have no web routes yet
+- Forgot password works by email verification only — no OTP or email link (college project)
